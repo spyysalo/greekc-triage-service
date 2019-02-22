@@ -29,15 +29,28 @@ def get_pubtator_data(pmid):
     return data
 
 
+def textbound_annotation(index, ann):
+    type_ = ann['obj'].split(':')[0]    # e.g. "Gene:4363" -> "Gene"
+    begin, end = ann['span']['begin'], ann['span']['end']
+    return 'T{}\t{}\t{}\t{}\tTODO'.format(index, type_, begin, end)
+
+
+def visualize_pubtator_data(data):
+    ann = []
+    for i, a in enumerate(data['denotations']):
+        ann.append(textbound_annotation(i, a))
+    return """<div class="visualization">
+<pre><code class="language-ann">{}
+{}
+</code></pre>
+</div>""".format(data['text'], '\n'.join(ann))
+
+
 @app.route('/triage/<pmid>')
 def triage(pmid):
     data = get_pubtator_data(pmid)
     #text = data['text'] + str(data['denotations'])
-    text = Markup("""<div class="visualization-test">
-<pre><code class="language-ann">{}
-T1 TEST 0 10 test
-</code></pre>
-</div>""".format(data['text']))
+    text = Markup(visualize_pubtator_data(data))
     return render_template('base.html', text=text)
 
 
