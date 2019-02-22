@@ -167,7 +167,7 @@ def triage(pmids):
         data = get_pubtator_data(pmid)
         probability = predict_probability(data['text'])
         prob_data.append((probability, data))
-    prob_data.sort(reverse=True)
+    prob_data.sort(key=lambda a:a[0], reverse=True)
     texts = []
     for probability, data in prob_data:
         text = '<div><span>{}</span> <span>{:.3f}</span> <span>{}</span></div>'\
