@@ -1,76 +1,152 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Malaga Workshop - Text Mining Hackathon</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <style>
+            body {
+                padding-top: 50px;
+                padding-bottom: 20px;
+            }
+        </style>
+        <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="/static/css/main.css">
 
-    <title>GREEKC Hackathon</title>
-</head>
-<body>
-<h1>Pretty Baseline</h1>
+        <script src="/static/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
 
-<form id="pmids">
-    <fieldset>
-        <legend>Add PMID</legend>
-        <label for="PMID">PMID</label>
-        <input type="text" id="pmid" name="pmid" />
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Hello, curators!</h1>
+        <p>This is a helpful interface to DELFT. Input PMIDs into the list to text mine the contents.</p>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+      </div>
+    </div>
 
-        <button>Add</button>
-    </fieldset>
-</form>
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-3">
+          <h2>Instructions</h2>
+          <p>Add your PMIDs to the list on the right, click on "Text Mine" and check the results!</p>
+          <!--<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>-->
+        </div>
+        <div class="col-md-3">
+          <h2>Start Here ....</h2>
 
-<ol id="pmids-list"></ol>
+            <form id="pmids">
+                <fieldset>
+                    <legend>Add PMID</legend>
+                    <div class="input-group ">
+                        <label for="PMID">PMID</label>
+                        <input class="form-control" type="text" id="pmid" name="pmid" />
+                    </div>
 
-<form id="submitlist" name="submitlist">
-    <!--<input type="hidden" name="src_pmids" id="src_pmids" value="" />-->
-    <button onclick="submitform()">Mine PMIDs</button>
-</form>
+                    <button class="btn btn-success" onclick="event.preventDefault(); additem();">Add</button>
+                </fieldset>
+            </form>
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+            <ul class="list-group" id="pmids-list"></ul>
 
-<script>
-    var list = document.getElementById('pmids-list');
-    var entry = document.getElementById('pmids');
+            <form id="submitlist" name="submitlist">
+                <!--<input type="hidden" name="src_pmids" id="src_pmids" value="" />-->
+                <button class="btn btn-success" onclick="submitform()">Mine PMIDs</button>
+            </form>
+       </div>
+        <!--<div class="col-md-4">-->
+          <!--<h2>Heading</h2>-->
+          <!--<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>-->
+          <!--<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>-->
+        <!--</div>-->
+      </div>
 
-    var pmidarr = [];
+      <!--<hr>-->
 
-    var submitstring = "";
+      <!--<footer>-->
+        <!--<p>&copy; Company 2015</p>-->
+      <!--</footer>-->
+    </div> <!-- /container -->        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+
+        <script src="/static/js/vendor/bootstrap.min.js"></script>
+
+        <script src="/static/js/main.js"></script>
+
+        <script>
+            var list = document.getElementById('pmids-list');
+            var entry = document.getElementById('pmid');
+
+            var pmidarr = [];
+
+            var submitstring = "";
 
 
-    // function buildhidden() {
-    //     document.getElementById("src_pmids").value = submitstring;
-    // }
+            // function buildhidden() {
+            //     document.getElementById("src_pmids").value = submitstring;
+            // }
 
-    function submitform()
-    {
-        document.submitlist.action = "http://127.0.0.1:5000/triage/"+submitstring;
-        document.submitlist.submit();
-    }
+            function submitform()
+            {
+                document.submitlist.action = "http://127.0.0.1:5000/triage/"+submitstring;
+                document.submitlist.submit();
+            }
 
-    entry.onsubmit = function(evt) {
-        evt.preventDefault();
-        var pmid = document.getElementById('pmid').value;
-        var entry = document.createElement('li');
-        entry.appendChild(document.createTextNode(pmid));
-        if (!pmidarr.includes(pmid)) {
-            list.appendChild(entry);
-            pmidarr.push(pmid);
+            // entry.onsubmit = function(evt) {
+            function additem() {
+                // this.preventDefault();
+                var pmid = document.getElementById('pmid').value;
+                var entry = document.createElement('li');
+                entry.className += "list-group-item";
 
-            if (submitstring === "")
-                submitstring = pmid;
-            else
-                submitstring += "," + pmid;
-        }
-    }
-</script>
+                entry.appendChild(document.createTextNode(pmid));
+                if (!pmidarr.includes(pmid)) {
+                    list.appendChild(entry);
+                    pmidarr.push(pmid);
 
-</body>
+                    if (submitstring === "")
+                        submitstring = pmid;
+                    else
+                        submitstring += "," + pmid;
+                }
+            }
+        </script>
+    </body>
 </html>
