@@ -131,6 +131,7 @@ def predict_probability(text):
     if Classifier is not None:
         try:
             probability = Classifier.get_result(text)
+            probability = float(probability)
         except:
             error('GET_RESULT ERROR')
             probability = random()
@@ -140,16 +141,30 @@ def predict_probability(text):
     return probability
 
 
+def truncate(text, max_len=130):
+    elision = ' [...]'
+    if len(text) <= max_len:
+        return text
+    else:
+        return text[:max_len-len(elision)] + elision
+
+
 @app.route('/triage/<pmids>')
 def triage(pmids):
-    texts = []
+    prob_data = []
     for pmid in pmids.split(','):
         data = get_pubtator_data(pmid)
         probability = predict_probability(data['text'])
-        text = visualize_pubtator_data(data) + \
-               '<div>{}</div>'.format(probability)
+        prob_data.append((probability, data))
+    prob_data.sort(reverse=True)
+    texts = []
+    for probability, data in prob_data:
+        text = '<div><span>{}</span> <span>{:.3f}</span> <span>{}</span></div>'\
+               .format(data['sourceid'], probability, truncate(data['text'])) \
+               + visualize_pubtator_data(data) \
+               + '<hr>'
         texts.append(text)
-    return render_template('base.html', text=Markup('\n'.join(texts)))
+    return render_template('base.html', content=Markup('\n'.join(texts)))
 
 
 @app.route('/')

@@ -587,3 +587,8 @@ code.embedded-wrapper,
 a.doclink {
   text-decoration: none;
 }
+
+div.visualization {
+    margin-left: 50px;
+    margin-right: 50px;
+}
