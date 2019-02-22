@@ -14,7 +14,6 @@ from flask import Markup
 app = Flask(__name__)
 
 
-
 class NonBlockingStreamReader:
     # from https://gist.github.com/EyalAr/7915597
     def __init__(self, stream):
@@ -82,7 +81,11 @@ class Delft_Class(object):
         return result
 
 
-Classifier = Delft_Class()
+try:
+    Classifier = Delft_Class()
+except:
+    Classifier = None    # development fallback
+
 
 def pubtator_url(pmid, concept='BioConcept', format_='JSON'):
     u = 'https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/RESTful/tmTool.cgi/'\
@@ -125,7 +128,13 @@ def visualize_pubtator_data(data):
 @app.route('/triage/<pmid>')
 def triage(pmid):
     data = get_pubtator_data(pmid)
-    probability = Classifier.get_result(data['text'])
+    if Classifier is not None:
+        try:
+            probability = Classifier.get_result(data['text'])
+        except:
+            probability = '<GET_RESULT ERROR>'
+    else:
+        probability = '<NO CLASSIFIER>'
     text = Markup(visualize_pubtator_data(data))
     return render_template('base.html', text=text, probability=probability)
 
