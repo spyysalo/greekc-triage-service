@@ -9,6 +9,8 @@ from queue import Queue, Empty
 import json
 
 from flask import Markup
+from random import random
+from logging import warn, error
 
 
 app = Flask(__name__)
@@ -125,19 +127,27 @@ def visualize_pubtator_data(data):
 </div>""".format(data['text'], '\n'.join(ann))
 
 
+def predict_probability(text):
+    if Classifier is not None:
+        try:
+            probability = Classifier.get_result(text)
+        except:
+            error('GET_RESULT ERROR')
+            probability = random()
+        else:
+            error('NO CLASSIFIER')
+            probability = random()
+    return probability
+
+
 @app.route('/triage/<pmids>')
 def triage(pmids):
     texts = []
     for pmid in pmids.split(','):
         data = get_pubtator_data(pmid)
-        if Classifier is not None:
-            try:
-                probability = Classifier.get_result(data['text'])
-            except:
-                probability = '[GET_RESULT ERROR]'
-            else:
-                probability = '[NO CLASSIFIER]'
-        text = visualize_pubtator_data(data) + '<div>{}</div>'.format(probability)
+        probability = predict_probability(data['text'])
+        text = visualize_pubtator_data(data) + \
+               '<div>{}</div>'.format(probability)
         texts.append(text)
     return render_template('base.html', text=Markup('\n'.join(texts)))
 
