@@ -9,6 +9,10 @@ from queue import Queue, Empty
 import json
 
 from flask import Markup
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 
 
 app = Flask(__name__)
@@ -141,6 +145,7 @@ def visualize_pubtator_data(data):
 @app.route('/triage/<pmid>')
 def triage(pmid):
     data = get_pubtator_data(pmid)
+<<<<<<< HEAD
     if Classifier is not None:
         try:
             probability = Classifier.get_result(data['text'])
@@ -148,6 +153,9 @@ def triage(pmid):
             probability = '<GET_RESULT ERROR>'
     else:
         probability = '<NO CLASSIFIER>'
+=======
+    probability = Classifier.get_result(data['text'])
+>>>>>>> master
     text = Markup(visualize_pubtator_data(data))
     return render_template('base.html', text=text, probability=probability)
 
