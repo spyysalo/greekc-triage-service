@@ -146,9 +146,9 @@ def predict_probability(text):
         except:
             error('GET_RESULT ERROR')
             probability = random()
-        else:
-            error('NO CLASSIFIER')
-            probability = random()
+    else:
+        error('NO CLASSIFIER')
+        probability = random()
     return probability
 
 
