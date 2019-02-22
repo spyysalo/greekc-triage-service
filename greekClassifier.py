@@ -14,8 +14,8 @@ import select
 list_classes = [1]
 
 
-def train(embeddings_name, fold_count): 
-    model = Classifier('greekc', "gru", list_classes=list_classes, use_char_feature=True, max_epoch=30, fold_number=fold_count, 
+def train(embeddings_name, fold_count):
+    model = Classifier('greekc', "gru", list_classes=list_classes, use_char_feature=True, max_epoch=30, fold_number=fold_count,
         use_roc_auc=True, embeddings_name=embeddings_name)
 
     print('loading greekc corpus...')
@@ -29,8 +29,8 @@ def train(embeddings_name, fold_count):
     model.save()
 
 
-def train_and_eval(embeddings_name, fold_count): 
-    model = Classifier('greekc', "gru", list_classes=list_classes, use_char_feature=True, max_epoch=3, fold_number=fold_count, 
+def train_and_eval(embeddings_name, fold_count):
+    model = Classifier('greekc', "gru", list_classes=list_classes, use_char_feature=True, max_epoch=3, fold_number=fold_count,
         use_roc_auc=True, embeddings_name=embeddings_name)
 
     print('loading greekc corpus...')
@@ -83,18 +83,6 @@ if __name__ == "__main__":
     # and that the path in the registry to the embedding file is correct on your system
     embeddings_name = "fasttext_300_opt"
 
-    if args.action == 'train':
-        if args.fold_count < 1:
-            raise ValueError("fold-count should be equal or more than 1")
-
-        train(embeddings_name, args.fold_count)
-
-    if args.action == 'train_eval':
-        if args.fold_count < 1:
-            raise ValueError("fold-count should be equal or more than 1")
-
-        y_test = train_and_eval(embeddings_name, args.fold_count)    
-
     if args.action == 'classify':
         stdout = sys.stdout
         sys.stdout = open('/dev/null', 'w')
@@ -109,7 +97,5 @@ if __name__ == "__main__":
             print(json.dumps(result, sort_keys=False, indent=4, ensure_ascii=False))
         else: # an empty line means stdin has been closed
             print('eof')
+            K.clear_session()
             exit(0)
-
-    # See https://github.com/tensorflow/tensorflow/issues/3388
-    K.clear_session()
