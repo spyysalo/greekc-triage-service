@@ -2,10 +2,13 @@ import requests
 from time import sleep
 from flask import Flask
 from flask import render_template
+
 import subprocess
 from threading import Thread
 from queue import Queue, Empty
 import json
+
+from flask import Markup
 
 
 app = Flask(__name__)
@@ -102,11 +105,29 @@ def get_pubtator_data(pmid):
     return data
 
 
+def textbound_annotation(index, ann):
+    type_ = ann['obj'].split(':')[0]    # e.g. "Gene:4363" -> "Gene"
+    begin, end = ann['span']['begin'], ann['span']['end']
+    return 'T{}\t{}\t{}\t{}\tTODO'.format(index, type_, begin, end)
+
+
+def visualize_pubtator_data(data):
+    ann = []
+    for i, a in enumerate(data['denotations']):
+        ann.append(textbound_annotation(i, a))
+    return """<div class="visualization">
+<pre><code class="language-ann">{}
+{}
+</code></pre>
+</div>""".format(data['text'], '\n'.join(ann))
+
+
 @app.route('/triage/<pmid>')
 def triage(pmid):
     data = get_pubtator_data(pmid)
     probability = Classifier.get_result(data['text'])
-    return render_template('base.html', text=data['text'], probability=probability)
+    text = Markup(visualize_pubtator_data(data))
+    return render_template('base.html', text=text, probability=probability)
 
 
 @app.route('/')
