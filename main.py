@@ -1,6 +1,7 @@
 import requests
 
 from flask import Flask
+from flask import render_template
 
 
 app = Flask(__name__)
@@ -30,7 +31,7 @@ def get_pubtator_data(pmid):
 @app.route('/triage/<pmid>')
 def triage(pmid):
     data = get_pubtator_data(pmid)
-    return data['text']
+    return render_template('base.html', text=data['text'])
 
 
 @app.route('/')
