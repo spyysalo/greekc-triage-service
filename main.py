@@ -2,6 +2,7 @@ import requests
 
 from flask import Flask
 from flask import render_template
+from flask import Markup
 
 
 app = Flask(__name__)
@@ -31,7 +32,13 @@ def get_pubtator_data(pmid):
 @app.route('/triage/<pmid>')
 def triage(pmid):
     data = get_pubtator_data(pmid)
-    return render_template('base.html', text=data['text'])
+    #text = data['text'] + str(data['denotations'])
+    text = Markup("""<div class="visualization-test">
+<pre><code class="language-ann">{}
+T1 TEST 0 10 test
+</code></pre>
+</div>""".format(data['text']))
+    return render_template('base.html', text=text)
 
 
 @app.route('/')
