@@ -125,18 +125,21 @@ def visualize_pubtator_data(data):
 </div>""".format(data['text'], '\n'.join(ann))
 
 
-@app.route('/triage/<pmid>')
-def triage(pmid):
-    data = get_pubtator_data(pmid)
-    if Classifier is not None:
-        try:
-            probability = Classifier.get_result(data['text'])
-        except:
-            probability = '<GET_RESULT ERROR>'
-    else:
-        probability = '<NO CLASSIFIER>'
-    text = Markup(visualize_pubtator_data(data))
-    return render_template('base.html', text=text, probability=probability)
+@app.route('/triage/<pmids>')
+def triage(pmids):
+    texts = []
+    for pmid in pmids.split(','):
+        data = get_pubtator_data(pmid)
+        if Classifier is not None:
+            try:
+                probability = Classifier.get_result(data['text'])
+            except:
+                probability = '[GET_RESULT ERROR]'
+            else:
+                probability = '[NO CLASSIFIER]'
+        text = visualize_pubtator_data(data) + '<div>{}</div>'.format(probability)
+        texts.append(text)
+    return render_template('base.html', text=Markup('\n'.join(texts)))
 
 
 @app.route('/')
