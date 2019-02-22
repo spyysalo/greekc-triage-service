@@ -9,14 +9,11 @@ from queue import Queue, Empty
 import json
 
 from flask import Markup
-<<<<<<< HEAD
-=======
-
->>>>>>> master
+from random import random
+from logging import warn, error
 
 
 app = Flask(__name__)
-
 
 class NonBlockingStreamReader:
     # from https://gist.github.com/EyalAr/7915597
@@ -97,7 +94,6 @@ class Delft_Class(object):
         return result
 
 
-
 try:
     Classifier = Delft_Class()
 except:
@@ -142,24 +138,46 @@ def visualize_pubtator_data(data):
 </div>""".format(data['text'], '\n'.join(ann))
 
 
-@app.route('/triage/<pmid>')
-def triage(pmid):
-    data = get_pubtator_data(pmid)
-<<<<<<< HEAD
+def predict_probability(text):
     if Classifier is not None:
         try:
-            probability = Classifier.get_result(data['text'])
+            probability = Classifier.get_result(text)
+            probability = float(probability)
         except:
-            probability = '<GET_RESULT ERROR>'
+            error('GET_RESULT ERROR')
+            probability = random()
+        else:
+            error('NO CLASSIFIER')
+            probability = random()
+    return probability
+
+
+def truncate(text, max_len=130):
+    elision = ' [...]'
+    if len(text) <= max_len:
+        return text
     else:
-        probability = '<NO CLASSIFIER>'
-=======
-    probability = Classifier.get_result(data['text'])
->>>>>>> master
-    text = Markup(visualize_pubtator_data(data))
-    return render_template('base.html', text=text, probability=probability)
+        return text[:max_len-len(elision)] + elision
+
+
+@app.route('/triage/<pmids>')
+def triage(pmids):
+    prob_data = []
+    for pmid in pmids.split(','):
+        data = get_pubtator_data(pmid)
+        probability = predict_probability(data['text'])
+        prob_data.append((probability, data))
+    prob_data.sort(reverse=True)
+    texts = []
+    for probability, data in prob_data:
+        text = '<div><span>{}</span> <span>{:.3f}</span> <span>{}</span></div>'\
+               .format(data['sourceid'], probability, truncate(data['text'])) \
+               + visualize_pubtator_data(data) \
+               + '<hr>'
+        texts.append(text)
+    return render_template('base.html', content=Markup('\n'.join(texts)))
 
 
 @app.route('/')
 def root():
-    return '<html><body>Try here: <a href="triage/123">triage/123</a></body></html>'
+    return render_template('front.html')
