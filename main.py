@@ -15,7 +15,6 @@ from logging import warn, error
 
 app = Flask(__name__)
 
-
 class NonBlockingStreamReader:
     # from https://gist.github.com/EyalAr/7915597
     def __init__(self, stream):
@@ -64,22 +63,34 @@ class Delft_Class(object):
         """
         self._tagger = subprocess.Popen('python3 greekClassifier.py classify', shell=True,
                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        sleep(10)
+        sleep(40)
 
         self._nbsr = NonBlockingStreamReader(self._tagger.stdout)
-        sleep(2)
+        sleep(5)
 
     def get_result(self, text):
 
 
         results = list()
-
+        print(text)
         self._tagger.stdin.write((text + '\n').encode('utf-8'))
         self._tagger.stdin.flush()
-        output = self._nbsr.readline(0.1)
-        result_tmp = json.load(output.strip())
+        sleep(4)
+        results = []
+        stop_it = 0
+        while True:
+            while True:
+                output = self._nbsr.readline(0.1)
+                # 0.1 secs to let the shell output the result
+                if not output:
+                    stop_it = stop_it + 1
+                    break
+                results.append(output.decode('utf-8'))
+            if len(results) > 0 or stop_it > 3:
+                break
+        results = ''.join(results)
+        result_tmp = json.loads(results.strip())
         result = result_tmp['classifications'][0]['1']
-
         return result
 
 
