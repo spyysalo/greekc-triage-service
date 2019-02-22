@@ -2,14 +2,16 @@ import requests
 from time import sleep
 from flask import Flask
 from flask import render_template
+
 import subprocess
 from threading import Thread
 from queue import Queue, Empty
 import json
 
+from flask import Markup
+
 
 app = Flask(__name__)
-
 
 
 class NonBlockingStreamReader:
@@ -60,26 +62,43 @@ class Delft_Class(object):
         """
         self._tagger = subprocess.Popen('python3 greekClassifier.py classify', shell=True,
                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        sleep(10)
+        sleep(40)
 
         self._nbsr = NonBlockingStreamReader(self._tagger.stdout)
-        sleep(2)
+        sleep(5)
 
     def get_result(self, text):
 
 
         results = list()
-
+        print(text)
         self._tagger.stdin.write((text + '\n').encode('utf-8'))
         self._tagger.stdin.flush()
-        output = self._nbsr.readline(0.1)
-        result_tmp = json.load(output.strip())
+        sleep(4)
+        results = []
+        stop_it = 0
+        while True:
+            while True:
+                output = self._nbsr.readline(0.1)
+                # 0.1 secs to let the shell output the result
+                if not output:
+                    stop_it = stop_it + 1
+                    break
+                results.append(output.decode('utf-8'))
+            if len(results) > 0 or stop_it > 3:
+                break
+        results = ''.join(results)
+        result_tmp = json.loads(results.strip())
         result = result_tmp['classifications'][0]['1']
-
         return result
 
 
-Classifier = Delft_Class()
+
+try:
+    Classifier = Delft_Class()
+except:
+    Classifier = None    # development fallback
+
 
 def pubtator_url(pmid, concept='BioConcept', format_='JSON'):
     u = 'https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/RESTful/tmTool.cgi/'\
@@ -102,11 +121,35 @@ def get_pubtator_data(pmid):
     return data
 
 
+def textbound_annotation(index, ann):
+    type_ = ann['obj'].split(':')[0]    # e.g. "Gene:4363" -> "Gene"
+    begin, end = ann['span']['begin'], ann['span']['end']
+    return 'T{}\t{}\t{}\t{}\tTODO'.format(index, type_, begin, end)
+
+
+def visualize_pubtator_data(data):
+    ann = []
+    for i, a in enumerate(data['denotations']):
+        ann.append(textbound_annotation(i, a))
+    return """<div class="visualization">
+<pre><code class="language-ann">{}
+{}
+</code></pre>
+</div>""".format(data['text'], '\n'.join(ann))
+
+
 @app.route('/triage/<pmid>')
 def triage(pmid):
     data = get_pubtator_data(pmid)
-    probability = Classifier.get_result(data['text'])
-    return render_template('base.html', text=data['text'], probability=probability)
+    if Classifier is not None:
+        try:
+            probability = Classifier.get_result(data['text'])
+        except:
+            probability = '<GET_RESULT ERROR>'
+    else:
+        probability = '<NO CLASSIFIER>'
+    text = Markup(visualize_pubtator_data(data))
+    return render_template('base.html', text=text, probability=probability)
 
 
 @app.route('/')
