@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>GREEKC Hackathon</title>
+</head>
+<body>
+<h1>Pretty Baseline</h1>
+
+<form id="pmids">
+    <fieldset>
+        <legend>Add PMID</legend>
+        <label for="PMID">PMID</label>
+        <input type="text" id="pmid" name="pmid" />
+
+        <button>Add</button>
+    </fieldset>
+</form>
+
+<ol id="pmids-list"></ol>
+
+<form id="submitlist" name="submitlist">
+    <!--<input type="hidden" name="src_pmids" id="src_pmids" value="" />-->
+    <button onclick="submitform()">Mine PMIDs</button>
+</form>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script>
+    var list = document.getElementById('pmids-list');
+    var entry = document.getElementById('pmids');
+
+    var pmidarr = [];
+
+    var submitstring = "";
+
+
+    // function buildhidden() {
+    //     document.getElementById("src_pmids").value = submitstring;
+    // }
+
+    function submitform()
+    {
+        document.submitlist.action = "http://127.0.0.1:5000/triage/"+submitstring;
+        document.submitlist.submit();
+    }
+
+    entry.onsubmit = function(evt) {
+        evt.preventDefault();
+        var pmid = document.getElementById('pmid').value;
+        var entry = document.createElement('li');
+        entry.appendChild(document.createTextNode(pmid));
+        if (!pmidarr.includes(pmid)) {
+            list.appendChild(entry);
+            pmidarr.push(pmid);
+
+            if (submitstring === "")
+                submitstring = pmid;
+            else
+                submitstring += "," + pmid;
+        }
+    }
+</script>
+
+</body>
+</html>

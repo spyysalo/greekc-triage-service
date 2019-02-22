@@ -141,4 +141,4 @@ def triage(pmid):
 
 @app.route('/')
 def root():
-    return '<html><body>Try here: <a href="triage/123">triage/123</a></body></html>'
+    return render_template('front.html')
